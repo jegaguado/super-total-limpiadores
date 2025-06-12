@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sofia+Sans+Condensed:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
+ <meta charset="UTF-8">
+  <title>Estanterías dinámicas</title>
+  <style>
+    * {
+      font-family: "Sofia Sans Condensed", serif;
+      box-sizing: border-box;
+      font-weight: 400;
+    }
+
+    h2,button {
+    background-color: #002366;
+    color: red;
+    font-weight: bold;
+    font-size: 3em;
+    padding: 10px 50px;
+    border-radius: 15px;
+    text-shadow: 0px 0px 4px white, 1px 1px 5px white;
+    border: 2px solid #888;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    margin: 20px auto;
+    margin-top: 30px;
+    width: max-content;
+    }
+
+    h2{
+      margin-bottom: 50px;
+    }
+
+    button{
+        font-size: 1.5em;
+         margin: 0 10px;
+        margin-top: 0;
+        cursor: pointer;
+    }
+
+    body{
+      display:flex;
+      flex-direction: column-reverse;
+      justify-content: space-between;
+      align-items: center;
+      gap: 30px;
+    }
+
+
+
+    .background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('fondo-supermercado.jfif');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px) brightness(0.80);
+      z-index: -1;
+    }
+
+    .brefolution-logo{
+      position: absolute;
+      right: 20px;
+      top: -20px;
+      width: 10%;
+    }
+
+    .brefolution-logo img{
+      width: 100%;
+    }
+
+    .box-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(28, 3vw);
+      grid-template-rows: repeat(5, 4vw);
+      max-width: 100vw;
+      gap: 0px;
+      overflow-x: hidden;
+      margin: 0 auto;
+      background-color: #a1a1a1;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border-bottom: 3px solid #b3b3b3;
+      border-top: 3px solid #fff;
+    }
+
+    .separator {
+      border-right: 3px solid #525252;
+    }
+
+    .barra-iconos {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: inherit;
+      align-items: flex-start;
+      gap: 30px;
+      z-index: 10;
+      display:flex;
+      flex-direction: row-reverse;
+      justify-content: space-evenly;
+      padding-top: 20px;
+    }
+
+    .icono-selector , #papeleraIcono {
+      display:flex;
+      flex-direction: column;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      border-radius: 5px;
+    }
+
+    .icono-selector img{
+      max-width: 100%;
+      margin-bottom: 5px;
+    }
+
+    .icono-selector .txt-iconos{
+      font-size: 1.2em;
+      text-align: center;
+      color: #ccc;
+    }
+
+    .seleccionado {
+      border-color: red;
+      box-shadow: 0 0 5px rgb(255, 32, 32);
+    }
+
+
+    .cell img {
+      max-height: 90%; 
+    }
+
+    #contadorTotal {
+      position: absolute;
+      top:0;
+
+      visibility: hidden;
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+      background-color: #333;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+.barra-progreso-container {
+  position: relative;
+  width: 90%;
+  height: 30px;
+  margin: 60px auto;
+}
+
+.barra-fondo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, red, orange, yellow, green);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 1px 3px 5px rgba(0,0,0,0.5);
+}
+
+.barra-cobertura {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%; /* empieza cubriendo todo */
+  background-color: #ddd; /* gris claro */
+  transition: width 0.5s ease;
+  border-radius: 0 20px 20px 0;
+}
+
+.porcentaje-label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  color: #111;
+  z-index: 1;
+}
+
+
+    .barra-inferior{
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 125px;
+      background: rgba(148, 148, 148, 0.95);
+      border-top: 2px solid #ccc;
+      z-index: 10;
+    }
+  </style>
+</head>
+<div>
+  <div class="brefolution-logo"><img src="img/Brefolution2025.png" alt="Logo Brefolution 2025"></div>
+  <h2>TOTAL LIMPIADORES</h2>
+  <div id="contadorTotal">Total: 0</div>
+
+  <div class="background"></div>
+  <div class="box-grid"><div class="grid" id="contenedor"></div></div>
+
+<div class="barra-progreso-container">
+  <div class="barra-fondo">
+    <div class="barra-cobertura" id="barraCobertura"></div>
+  </div>
+  <div class="porcentaje-label" id="porcentajeLabel">0%</div>
+</div>
+
+
+  <div class="barra-inferior">
+    <div class="barra-iconos" id="barraIconos">
+      <button onclick="location.href='supermercado-mundo-bano.html'">Mundo Baño</button>
+      <button id="mostrarMaximo">¡Maximiza tu lineal!</button>
+      <img src="img/papelera.png" id="papeleraIcono" class="img-iconos" title="Borrar elementos">
+    </div>
+  </div>
+
+  <script>
+    const contenedor = document.getElementById("contenedor");
+    const contador = document.getElementById("contadorTotal");
+    const barraProgreso = document.getElementById("barraProgreso");
+    const porcentajeLabel = document.getElementById("porcentajeLabel");
+
+    const papelera = document.getElementById("papeleraIcono");
+    papelera.addEventListener("click", () => {
+      document.querySelectorAll(".icono-selector img").forEach(i => i.classList.remove("seleccionado"));
+      papelera.classList.add("seleccionado");
+      iconoSeleccionado = papelera;
+    });
+
+    let total = 0;
+    const TOTAL_MAXIMO = 1009904;
+
+    const iconosConfig = {
+      "TWC_03": { valor: 9506, max: 40, acumulado: 0, txt: "Mundo Baño" },
+      "TWC_cocina": { valor: 6101, max: 12, acumulado: 0, txt: "Cocina" },
+      "TWC_bref": { valor: 9941, max: 8, acumulado: 0, txt: "Otros limpiadores" },
+      "TWC_LIMPIADORES UNIVERSALES": { valor: 6090, max: 52, acumulado: 0, txt: "Limpiadores universales" },
+      "TWC_lejias": { valor: 5723, max: 28, acumulado: 0, txt: "Lejías" }
+    };
+
+    for (let i = 0; i < 140; i++) {
+      const celda = document.createElement("div");
+      celda.className = "cell";
+      const col = i % 28;
+      if ((col + 1) % 4 === 0 && col !== 27) celda.classList.add("separator");
+      celda.dataset.ocupado = "false";
+      contenedor.appendChild(celda);
+    }
+
+    const objetos = Object.keys(iconosConfig);
+    const barra = document.getElementById("barraIconos");
+    let iconoSeleccionado = null;
+
+    objetos.forEach(nombre => {
+      const ruta = `/img/241-25 - Henkel Ibérica - Iconos Dummies para ${nombre}.png`;
+      const img = document.createElement("img");
+      const box = document.createElement("div");
+      const txt = document.createElement("div");
+      txt.classList.add("txt-iconos");
+      txt.textContent = iconosConfig[nombre].txt;
+      img.src = ruta;
+      img.alt = nombre;
+      img.title = nombre; 
+      img.classList.add("img-iconos");
+      box.classList.add("icono-selector");
+      img.dataset.nombre = nombre;
+      box.appendChild(img);
+      box.appendChild(txt);
+      barra.appendChild(box);
+
+      img.addEventListener("click", () => {
+        document.querySelectorAll(".barra-iconos img").forEach(i => i.classList.remove("seleccionado"));
+        img.classList.add("seleccionado");
+        iconoSeleccionado = img;
+      });
+    });
+
+function actualizarContadorYBarra() {
+  contador.textContent = `Total: ${total.toFixed(3)}`;
+  const porcentaje = Math.min((total / TOTAL_MAXIMO) * 100, 100);
+
+  const cobertura = document.getElementById("barraCobertura");
+  cobertura.style.width = `${100 - porcentaje}%`; // se va quitando
+
+  porcentajeLabel.textContent = `${porcentaje.toFixed(0)}%`;
+}
+
+
+
+    function intentarColocar(celda) {
+      if (!celda || !celda.classList.contains("cell")) return;
+
+      if (iconoSeleccionado) {
+        const esPapelera = iconoSeleccionado.id === "papeleraIcono";
+
+        if (esPapelera && celda.dataset.ocupado === "true") {
+          const nombre = celda.querySelector("img")?.getAttribute("alt");
+          if (iconosConfig[nombre]) {
+            if (iconosConfig[nombre].acumulado > 0) {
+              iconosConfig[nombre].acumulado -= 1;
+              if (iconosConfig[nombre].acumulado < iconosConfig[nombre].max) {
+                total -= iconosConfig[nombre].valor;
+                total = Math.max(0, total);
+                actualizarContadorYBarra();
+              }
+            }
+          }
+          celda.innerHTML = "";
+          celda.dataset.ocupado = "false";
+        }
+
+        if (!esPapelera && celda.dataset.ocupado === "false") {
+          const nombre = iconoSeleccionado.dataset.nombre;
+          const config = iconosConfig[nombre];
+
+          const img = document.createElement("img");
+          img.src = iconoSeleccionado.src;
+          img.alt = nombre;
+          celda.appendChild(img);
+          celda.dataset.ocupado = "true";
+
+          if (config) {
+            config.acumulado += 1;
+            if (config.acumulado <= config.max) {
+              total += config.valor;
+              actualizarContadorYBarra();
+            }
+          }
+        }
+      }
+    }
+
+    let colocando = false;
+
+  contenedor.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // ← evita el scroll vertical
+    const touch = e.touches[0];
+    if (iconoSeleccionado && iconoSeleccionado.id === "papeleraIcono") {
+      const celdasCercanas = getNearbyCells(touch.clientX, touch.clientY);
+      celdasCercanas.forEach(c => intentarColocar(c));
+    } else {
+      const celda = document.elementFromPoint(touch.clientX, touch.clientY);
+      intentarColocar(celda);
+    }
+    colocando = true;
+  }, { passive: false });
+
+
+    contenedor.addEventListener("touchmove", (e) => {
+      if (colocando) {
+        e.preventDefault();
+        const touch = e.touches[0];
+if (iconoSeleccionado && iconoSeleccionado.id === "papeleraIcono") {
+  const celdasCercanas = getNearbyCells(touch.clientX, touch.clientY);
+  celdasCercanas.forEach(c => intentarColocar(c));
+} else {
+  const celda = document.elementFromPoint(touch.clientX, touch.clientY);
+  intentarColocar(celda);
+}
+
+      }
+    }, { passive: false });
+
+    contenedor.addEventListener("touchend", () => {
+      colocando = false;
+    });
+
+    contenedor.addEventListener("mousedown", (e) => {
+      intentandoColocarConMouse(e);
+      colocando = true;
+    });
+
+    contenedor.addEventListener("mousemove", (e) => {
+      if (colocando) intentandoColocarConMouse(e);
+    });
+
+    contenedor.addEventListener("mouseup", () => {
+      colocando = false;
+    });
+
+    function intentandoColocarConMouse(e) {
+      const celda = document.elementFromPoint(e.clientX, e.clientY);
+      intentarColocar(celda);
+    }
+
+    //borrado robusto
+    function getNearbyCells(x, y, radio = 20) {
+  const cells = [];
+  document.querySelectorAll(".cell").forEach(celda => {
+    const rect = celda.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const distancia = Math.hypot(cx - x, cy - y);
+    if (distancia <= radio) cells.push(celda);
+  });
+  return cells;
+}
+
+
+    //valores maximos ideales
+
+    document.getElementById("mostrarMaximo").addEventListener("click", () => {
+    const valoresIdeal = [
+    [9506, 9506, 9506, 9506, 9506, 9506, 9506, 9506, 9941, 9941, 9941, 9941, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 5723, 5723, 5723, 5723],
+    [9506, 9506, 9506, 9506, 9506, 9506, 9506, 9506, 9941, 9941, 9941, 9941, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 5723, 5723, 5723, 5723],
+    [9506, 9506, 9506, 9506, 9506, 9506, 9506, 9506, 6101, 6101, 6101, 6101, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 5723, 5723, 5723, 5723],
+    [9506, 9506, 9506, 9506, 9506, 9506, 9506, 9506, 6101, 6101, 6101, 6101, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 5723, 5723, 5723, 5723, 5723, 5723, 5723, 5723],
+    [9506, 9506, 9506, 9506, 9506, 9506, 9506, 9506, 6101, 6101, 6101, 6101, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 6090, 5723, 5723, 5723, 5723, 5723, 5723, 5723, 5723]
+    ];
+
+
+    const valorToNombre = {};
+    Object.entries(iconosConfig).forEach(([nombre, cfg]) => {
+      valorToNombre[cfg.valor] = nombre;
+    });
+
+    const celdas = document.querySelectorAll(".cell");
+    Object.keys(iconosConfig).forEach(k => iconosConfig[k].acumulado = 0);
+    total = 0;
+
+    celdas.forEach((celda, idx) => {
+      celda.innerHTML = "";
+      celda.dataset.ocupado = "false";
+
+      const fila = Math.floor(idx / 28);
+      const columna = idx % 28;
+      const valor = valoresIdeal[fila][columna];
+      const nombre = valorToNombre[valor];
+      const icono = iconosConfig[nombre];
+
+      if (nombre && icono) {
+        const img = document.createElement("img");
+        img.src = `img/241-25 - Henkel Ibérica - Iconos Dummies para ${nombre}.png`;
+        img.alt = nombre;
+        celda.appendChild(img);
+        celda.dataset.ocupado = "true";
+        icono.acumulado++;
+        total += icono.valor;
+      }
+    });
+
+    actualizarContadorYBarra();
+  });
+  </script>
+</body>
+</html>
