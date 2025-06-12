@@ -237,6 +237,7 @@
     <div class="barra-iconos" id="barraIconos">
       <button onclick="location.href='supermercado-mundo-bano.html'">Mundo Baño</button>
       <button id="mostrarMaximo">¡Maximiza tu lineal!</button>
+            <button id="resetear">Resetear</button>
       <img src="img/papelera.png" id="papeleraIcono" class="img-iconos" title="Borrar elementos">
     </div>
   </div>
@@ -466,6 +467,17 @@ if (iconoSeleccionado && iconoSeleccionado.id === "papeleraIcono") {
       }
     });
 
+    document.getElementById("resetear").addEventListener("click", () => {
+  document.querySelectorAll(".cell").forEach(celda => {
+    celda.innerHTML = "";
+    celda.dataset.ocupado = "false";
+  });
+  Object.keys(iconosConfig).forEach(k => iconosConfig[k].acumulado = 0);
+  total = 0;
+  actualizarContadorYBarra();
+});
+
+      
     actualizarContadorYBarra();
   });
   </script>
